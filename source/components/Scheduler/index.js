@@ -14,16 +14,22 @@ import Spinner from '../Spinner';
 
 //Actions
 import { tasksActions } from '../../redux/tasks/actions';
+import { newTaskDescriptionActions } from '../../redux/newTask/actions';
 
 const mapStateToProps = state => {
   return {
-  	tasks: state.tasksReducer
+  	tasks: state.tasksReducer,
+    newTaskDescription: state.newTaskDescriptionReducer
   };
 };
 
 const mapDispatchToProps =  {
         fetchTasksAsync: tasksActions.fetchTasksAsync,
-        createTaskAsync: tasksActions.createTaskAsync
+        createTaskAsync: tasksActions.createTaskAsync,
+        removeTaskAsync: tasksActions.removeTaskAsync,
+        updateTaskAsync: tasksActions.updateTaskAsync,
+        updateNewTaskDescription: newTaskDescriptionActions.updateNewTaskDescription,
+        clearNewTaskDescription: newTaskDescriptionActions.clearNewTaskDescription,
 };
 
 @connect(
@@ -31,12 +37,27 @@ const mapDispatchToProps =  {
   mapDispatchToProps
 )
 export default class Scheduler extends Component {
-	taskDescription = null;
+    createTask = (event, taskDescription) => {
+    	event.preventDefault();
+        if(this.props.newTaskDescription.trim() !== ''){
+        	this.props.createTaskAsync(taskDescription.trim());
+            this.props.clearNewTaskDescription();
+        }
+    }
 
-	createTask = (event, taskDescription) => {
-		event.preventDefault();
-		this.props.createTaskAsync(taskDescription);
-	}
+    clickHandler = (event) => {
+        this.createTask(event, this.props.newTaskDescription)
+    }
+
+    keyPressHandler = (event) => {
+        if(event.key === 'Enter' ){
+            this.createTask(event, this.props.newTaskDescription)
+        }
+    }
+
+    updateNewTaskDescription = (event) => {
+        this.props.updateNewTaskDescription(event.target.value);
+    }
 
   componentDidMount() {
     this.props.fetchTasksAsync();
@@ -51,6 +72,8 @@ export default class Scheduler extends Component {
                 created = {task.get('created')}
                 completed = {task.get('completed')}
                 favorite = {task.get('favorite')}
+                removeTaskAsync = {this.props.removeTaskAsync}
+                updateTaskAsync = {this.props.updateTaskAsync}
             />
         ));
 
@@ -69,10 +92,12 @@ export default class Scheduler extends Component {
                                 maxLength = { 50 }
                                 placeholder = 'Описание моей новой задачи'
                                 type = 'text'
-                                ref={(node) => {this.taskDescription = node;}}
+                                onKeyPress = {this.keyPressHandler}
+                                onChange={this.updateNewTaskDescription}
+                                value = {this.props.newTaskDescription}
                             />
                             <button
-                           		onClick = {(event) => this.createTask(event, this.taskDescription.value)}
+                           		onClick = {this.clickHandler}
                             >
                             	Добавить задачу
                             </button>
