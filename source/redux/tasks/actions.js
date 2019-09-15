@@ -36,15 +36,27 @@ export const tasksActions = {
       payload: taskID,
     };
   },
-  updateTask: task => {
+  updateTaskFavorite: task => {
     return {
-      type: types.UPDATE_TASK,
+      type: types.UPDATE_TASK_FAVORITE,
       payload: task,
     };
   },
-  updateTaskAsync: task => {
+  updateTaskFavoriteAsync: task => {
     return {
-      type: types.UPDATE_TASK_ASYNC,
+      type: types.UPDATE_TASK_FAVORITE_ASYNC,
+      payload: task,
+    };
+  },
+  updateTaskCompleted: task => {
+    return {
+      type: types.UPDATE_TASK_COMPLETED,
+      payload: task,
+    };
+  },
+  updateTaskCompletedAsync: task => {
+    return {
+      type: types.UPDATE_TASK_COMPLETED_ASYNC,
       payload: task,
     };
   },

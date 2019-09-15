@@ -3,7 +3,7 @@ import { api } from '../../../../REST';
 import { tasksActions } from '../../actions';
 import { uiActions } from '../../../ui/actions';
 
-export function* updateTask({ payload: task }) {
+export function* updateTaskFavorite({ payload: task }) {
   try {
     yield put(uiActions.startFetching());
 
@@ -14,9 +14,9 @@ export function* updateTask({ payload: task }) {
       throw new Error(message);
     }
 
-    yield put(tasksActions.updateTask(data[0]));
+    yield put(tasksActions.updateTaskFavorite(data[0]));
   } catch (error) {
-    yield put(uiActions.emitError(error, 'updateTask worker'));
+    yield put(uiActions.emitError(error, 'updateTaskFavorite worker'));
   } finally {
     yield put(uiActions.stopFetching());
   }
