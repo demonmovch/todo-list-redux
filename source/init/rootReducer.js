@@ -6,5 +6,5 @@ import { newTaskDescriptionReducer } from '../redux/newTask/reducer';
 export const rootReducer = combineReducers({
   uiReducer,
   tasksReducer,
-  newTaskDescriptionReducer
+  newTaskDescriptionReducer,
 });

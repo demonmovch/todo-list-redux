@@ -14,6 +14,7 @@ export function* updateTaskFavorite({ payload: task }) {
       throw new Error(message);
     }
 
+    /* обновляем состояние favorite у соответствующей задачи */
     yield put(tasksActions.updateTaskFavorite(data[0]));
   } catch (error) {
     yield put(uiActions.emitError(error, 'updateTaskFavorite worker'));

@@ -5,6 +5,11 @@ import { createTask } from './workers/createTask';
 import { removeTask } from './workers/removeTask';
 import { updateTaskFavorite } from './workers/updateTaskFavorite';
 import { updateTaskCompleted } from './workers/updateTaskCompleted';
+import { updateAllTasksCompleted } from './workers/updateAllTasksCompleted';
+
+function* watchUpdateAllTasksCompleted() {
+  yield takeEvery(types.UPDATE_ALL_TASKS_COMPLETED_ASYNC, updateAllTasksCompleted);
+}
 
 function* watchupdateTaskCompleted() {
   yield takeEvery(types.UPDATE_TASK_COMPLETED_ASYNC, updateTaskCompleted);
@@ -33,5 +38,6 @@ export function* watchTasks() {
     call(watchRemoveTask),
     call(watchUpdateTaskFavorite),
     call(watchupdateTaskCompleted),
+    call(watchUpdateAllTasksCompleted),
   ]);
 }

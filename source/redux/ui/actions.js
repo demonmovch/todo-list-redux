@@ -19,4 +19,20 @@ export const uiActions = {
       meta,
     };
   },
+  updateTasksFilter: filterValue => {
+    return {
+      type: types.UPDATE_TASKS_FILTER,
+      payload: filterValue,
+    };
+  },
+  checkCheckbox: () => {
+    return {
+      type: types.CHECK_CHECKBOX,
+    };
+  },
+  uncheckCheckbox: () => {
+    return {
+      type: types.UNCHECK_CHECKBOX,
+    };
+  },
 };

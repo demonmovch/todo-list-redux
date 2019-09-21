@@ -2,10 +2,10 @@
 import React, { Component } from 'react';
 import FlipMove from 'react-flip-move';
 import { connect } from 'react-redux';
+import { toJS } from 'immutable';
 
 // Instruments
 import Styles from './styles.m.css';
-//import { tasks } from './tasks';
 
 // Components
 import Task from '../Task';
@@ -15,11 +15,14 @@ import Spinner from '../Spinner';
 //Actions
 import { tasksActions } from '../../redux/tasks/actions';
 import { newTaskDescriptionActions } from '../../redux/newTask/actions';
+import { uiActions } from '../../redux/ui/actions';
 
 const mapStateToProps = state => {
   return {
     tasks: state.tasksReducer,
     newTaskDescription: state.newTaskDescriptionReducer,
+    tasksFilter: state.uiReducer.get('tasksFilter'),
+    isChecked: state.uiReducer.get('isChecked'),
   };
 };
 
@@ -27,6 +30,8 @@ const mapDispatchToProps = {
   fetchTasksAsync: tasksActions.fetchTasksAsync,
   createTaskAsync: tasksActions.createTaskAsync,
   removeTaskAsync: tasksActions.removeTaskAsync,
+  updateTasksFilter: uiActions.updateTasksFilter,
+  updateAllTasksCompletedAsync: tasksActions.updateAllTasksCompletedAsync,
   updateTaskFavoriteAsync: tasksActions.updateTaskFavoriteAsync,
   updateTaskCompletedAsync: tasksActions.updateTaskCompletedAsync,
   updateNewTaskDescription: newTaskDescriptionActions.updateNewTaskDescription,
@@ -56,8 +61,32 @@ export default class Scheduler extends Component {
     }
   };
 
+  /* обновляем текст в поле описания новой задачи */
   updateNewTaskDescription = event => {
     this.props.updateNewTaskDescription(event.target.value);
+  };
+
+  /* ставим состояние completed у всех задач у которых оно не стоит при 
+     нажатии на чекбокс «Все задачи выполнены» */
+  completeAllTasks = () => {
+    if (!this.props.isChecked) {
+      let notCompletedTasks = this.props.tasks.filter(task => task.get('completed') !== true);
+      if (notCompletedTasks.length === 0) {
+        return null;
+      }
+
+      notCompletedTasks = notCompletedTasks.toJS();
+      notCompletedTasks = notCompletedTasks.map(item => {
+        return { ...item, completed: true };
+      });
+
+      this.props.updateAllTasksCompletedAsync(notCompletedTasks);
+    }
+  };
+
+  /* обновляем текст в поле поиска */
+  updateTasksFilter = event => {
+    this.props.updateTasksFilter(event.target.value.toLowerCase());
   };
 
   componentDidMount() {
@@ -65,7 +94,9 @@ export default class Scheduler extends Component {
   }
 
   render() {
-    const todoList = this.props.tasks.map(task => (
+    let tasksJSX;
+
+    const allTasks = task => (
       <Task
         key={task.get('id')}
         id={task.get('id')}
@@ -77,7 +108,18 @@ export default class Scheduler extends Component {
         updateTaskFavoriteAsync={this.props.updateTaskFavoriteAsync}
         updateTaskCompletedAsync={this.props.updateTaskCompletedAsync}
       />
-    ));
+    );
+
+    /* фильтруем задачи при вводе текста в поле поиска */
+    if (!this.props.tasksFilter) {
+      tasksJSX = this.props.tasks.map(allTasks);
+    } else {
+      let filteredTasks = this.props.tasks.filter(task =>
+        task.get('message').includes(this.props.tasksFilter)
+      );
+
+      tasksJSX = filteredTasks.map(allTasks);
+    }
 
     return (
       <section className={Styles.scheduler}>
@@ -85,7 +127,12 @@ export default class Scheduler extends Component {
         <main>
           <header>
             <h1>Планировщик задач</h1>
-            <input placeholder='Поиск' type='search' />
+            <input
+              placeholder='Поиск'
+              type='search'
+              onChange={this.updateTasksFilter}
+              value={this.props.tasksFilter}
+            />
           </header>
           <section>
             <form>
@@ -102,12 +149,17 @@ export default class Scheduler extends Component {
             </form>
             <div className={Styles.overlay}>
               <ul>
-                <FlipMove>{todoList}</FlipMove>
+                <FlipMove>{tasksJSX}</FlipMove>
               </ul>
             </div>
           </section>
           <footer>
-            <Checkbox checked color1='#363636' color2='#fff' />
+            <Checkbox
+              checked={this.props.isChecked}
+              color1='#363636'
+              color2='#fff'
+              onClick={this.completeAllTasks}
+            />
             <span className={Styles.completeAllTasks}>Все задачи выполнены</span>
           </footer>
         </main>

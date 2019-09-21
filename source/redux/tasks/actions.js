@@ -60,4 +60,16 @@ export const tasksActions = {
       payload: task,
     };
   },
+  updateAllTasksCompleted: tasks => {
+    return {
+      type: types.UPDATE_ALL_TASKS_COMPLETED,
+      payload: tasks,
+    };
+  },
+  updateAllTasksCompletedAsync: tasks => {
+    return {
+      type: types.UPDATE_ALL_TASKS_COMPLETED_ASYNC,
+      payload: tasks,
+    };
+  },
 };

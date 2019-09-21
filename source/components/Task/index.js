@@ -28,6 +28,8 @@ export default class Task extends PureComponent {
     this.props.updateTaskCompletedAsync({ message, completed: !completed, id, favorite });
   };
 
+  updateDescription = () => {};
+
   render() {
     const { message, completed, favorite } = this.props;
 
@@ -63,6 +65,7 @@ export default class Task extends PureComponent {
             className={Styles.updateTaskMessageOnClick}
             color1='#3B8EF3'
             color2='#000'
+            onClick={this.updateDescription}
           />
           <Remove
             inlineBlock
